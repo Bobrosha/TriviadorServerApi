@@ -1,13 +1,15 @@
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Linq;
+using System;
+using System.Drawing;
 
 namespace TriviadorServerApi.Entities
 {
     public class GameSession
     {
         private static TriviadorMap _Map;
-        private static string _Turn;
+        private static int _Turn;
 
         public static void Initialize()
         {
@@ -31,8 +33,11 @@ namespace TriviadorServerApi.Entities
 
         public static void AddPlayer(Player player)
         {
+            var id = _Map.Players.Count;
+            player.Id = id;
+            player.ColorName = Enum.GetValues(typeof(KnownColor)).GetValue(id).ToString();
             _Map.Players.Add(player);
-            _Turn = player.Name;
+            _Turn = id;
         }
 
         public static List<Player> GetPlayersList()
@@ -45,17 +50,17 @@ namespace TriviadorServerApi.Entities
             return _Map.Players.Count > 1;
         }
 
-        public static string GetWhoseTurn()
+        public static int GetWhoseTurn()
         {
             return _Turn;
         }
 
-        public static string NextTurn()
+        public static int? NextTurn()
         {
             if (GetReadyStatus())
             {
-                LinkedList<string> linkedListNames = new(from player in _Map.Players
-                                                    select player.Name);
+                LinkedList<int> linkedListNames = new(from player in _Map.Players
+                                                    select player.Id);
 
                 var name = linkedListNames.First;
                 while (name != null)
@@ -83,7 +88,8 @@ namespace TriviadorServerApi.Entities
         public static void SetMap(TriviadorMap map)
         {
             _Map = map;
-            _Turn = _Map.Players.First().Name;
+            if (GetReadyStatus())
+                _Turn = _Map.Players.First().Id;
         }
     }
 }

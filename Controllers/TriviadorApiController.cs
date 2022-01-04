@@ -16,28 +16,28 @@ namespace TriviadorServerApi.Controllers
             _logger = logger;
         }
 
-        [HttpGet("getMap")]
-        public TriviadorMap Get()
+        [HttpGet("map")]
+        public TriviadorMap GetMap()
         {
             return GameSession.GetMap();
         }
 
-        [HttpGet("getPlayersList")]
+        [HttpGet("playersList")]
         public IList GetPlayersList()
         {
             return GameSession.GetPlayersList();
         }
 
-        [HttpGet("getWhoseTurn")]
+        [HttpGet("whoseTurn")]
         public string GetWhoseTurn()
         {
-            return GameSession.GetWhoseTurn();
+            return GameSession.GetWhoseTurn().ToString();
         }
 
         [HttpGet("nextTurn")]
         public string NextTurn()
         {
-            return GameSession.NextTurn() ?? "Game session is not ready.\nThe list of players <= 1.";
+            return GameSession.NextTurn().ToString() ?? "Game session is not ready.\nThe list of players <= 1.";
         }
 
         [HttpPost("setMap")]
@@ -56,7 +56,7 @@ namespace TriviadorServerApi.Controllers
         }
 
         [HttpPut("addPlayer")]
-        public StatusCodeResult AddPlayer(Player player)
+        public StatusCodeResult AddPlayer([FromBody] Player player)
         {
             try
             {
@@ -71,7 +71,7 @@ namespace TriviadorServerApi.Controllers
         }
 
         [HttpPut("updateCell")]
-        public StatusCodeResult Put([FromBody] TriviadorMap.Cell cell)
+        public StatusCodeResult UpdateCell([FromBody] TriviadorMap.Cell cell)
         {
             try
             {

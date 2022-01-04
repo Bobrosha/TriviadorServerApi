@@ -1,13 +1,19 @@
-﻿namespace TriviadorServerApi.Entities
+﻿using System.Drawing;
+
+namespace TriviadorServerApi.Entities
 {
     public class Player
     {
+        public int Id { get; set; }
         public string Name { get; set; }
         public int Score { get; set; }
-        public Player(string name, int score = 0)
+        public string ColorName { get; set; }
+        public Player(int id, string name, string colorName, int score = 0)
         {
+            Id = id;
             Name = name;
             Score = score;
+            ColorName = colorName;
         }
     }
 }

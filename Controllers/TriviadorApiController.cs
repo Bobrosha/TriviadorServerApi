@@ -16,6 +16,19 @@ namespace TriviadorServerApi.Controllers
             _logger = logger;
         }
 
+        [HttpGet("getQuestion")]
+        public Question GetQuestion()
+        {
+            Question question = GameSession.GetRandomQuestion();
+            return question;
+        }
+
+        [HttpGet("readyStatus")]
+        public bool GetReadyStatus()
+        {
+            return GameSession.GetReadyStatus();
+        }
+
         [HttpGet("map")]
         public TriviadorMap GetMap()
         {

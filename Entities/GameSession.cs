@@ -10,10 +10,25 @@ namespace TriviadorServerApi.Entities
     {
         private static TriviadorMap _Map;
         private static int _Turn;
+        private static List<Question> _Questions;
 
         public static void Initialize()
         {
             _Map = new TriviadorMap();
+            _Questions = new List<Question>();
+            GetQuestions();
+        }
+
+        private static void GetQuestions()
+        {
+            string[] input = { "988", "1011", "983", "995" };
+            _Questions.Add(new Question("В каком году было крещение Руси?", new List<string>(input)));
+        }
+
+        public static Question GetRandomQuestion()
+        {
+            int randomIndex = new Random().Next(0, _Questions.Count);
+            return _Questions[randomIndex];
         }
 
         public static string GetSerializedMap()

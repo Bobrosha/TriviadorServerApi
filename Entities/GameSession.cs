@@ -10,25 +10,63 @@ namespace TriviadorServerApi.Entities
     {
         private static TriviadorMap _Map;
         private static int _Turn;
+        private static int _TurnQuestion = 0;
         private static List<Question> _Questions;
+        private static Question _CurrentQuestion;
+        private static Random random;
 
         public static void Initialize()
         {
             _Map = new TriviadorMap();
             _Questions = new List<Question>();
-            GetQuestions();
+            random = new Random();
+            InitQuestions();
         }
 
-        private static void GetQuestions()
+        private static void InitQuestions()
         {
             string[] input = { "988", "1011", "983", "995" };
             _Questions.Add(new Question("В каком году было крещение Руси?", new List<string>(input)));
         }
 
-        public static Question GetRandomQuestion()
+        public static Question GetQuestion()
         {
-            int randomIndex = new Random().Next(0, _Questions.Count);
-            return _Questions[randomIndex];
+            if (_CurrentQuestion == null)
+            {
+                GetRandomQuestion();
+            }
+
+            var answers = _CurrentQuestion.ListAnswers.ToList();
+
+            int n = answers.Count;
+            while (n > 1)
+            {
+                n--;
+                int k = random.Next(n + 1);
+                string value = answers[k];
+                answers[k] = answers[n];
+                answers[n] = value;
+            }
+
+            return new Question(_CurrentQuestion.TextQuestion, answers);
+        }
+
+        public static bool CheckQuestion(string answer)
+        {
+            bool flag = _CurrentQuestion.ListAnswers[0].Equals(answer);
+            _TurnQuestion++;
+            if (_TurnQuestion >= _Map.Players.Count)
+            {
+                _TurnQuestion = 0;
+                _CurrentQuestion = null;
+            }
+            return flag;
+        }
+
+        private static void GetRandomQuestion()
+        {
+            int randomIndex = random.Next(0, _Questions.Count);
+            _CurrentQuestion = _Questions[randomIndex];
         }
 
         public static string GetSerializedMap()

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections;
 using TriviadorServerApi.Entities;
 
@@ -14,13 +15,6 @@ namespace TriviadorServerApi.Controllers
         public TriviadorApiController(ILogger<TriviadorApiController> logger)
         {
             _logger = logger;
-        }
-
-        [HttpGet("getQuestion")]
-        public Question GetQuestion()
-        {
-            Question question = GameSession.GetRandomQuestion();
-            return question;
         }
 
         [HttpGet("readyStatus")]
@@ -51,6 +45,18 @@ namespace TriviadorServerApi.Controllers
         public string NextTurn()
         {
             return GameSession.NextTurn().ToString() ?? "Game session is not ready.\nThe list of players <= 1.";
+        }
+
+        [HttpGet("getQuestion")]
+        public Question GetQuestion()
+        {
+            return GameSession.GetQuestion();
+        }
+
+        [HttpPost("checkQuestion")]
+        public bool CheckQuestion([FromBody] object answer)
+        {
+            return GameSession.CheckQuestion(answer.ToString());
         }
 
         [HttpPost("setMap")]
@@ -93,7 +99,7 @@ namespace TriviadorServerApi.Controllers
                 _logger.LogDebug($"Updating completed successfull");
                 return new OkResult();
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
                 _logger.LogWarning("Exception while updating cell: " + e.Message);
                 return new BadRequestResult();

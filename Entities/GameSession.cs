@@ -19,6 +19,7 @@ namespace TriviadorServerApi.Entities
         {
             _Map = new TriviadorMap();
             _Questions = new List<Question>();
+            _Turn = 0;
             random = new Random();
             InitQuestions();
         }
@@ -90,7 +91,7 @@ namespace TriviadorServerApi.Entities
             player.Id = id;
             player.ColorName = Enum.GetValues(typeof(KnownColor)).GetValue(id).ToString();
             _Map.Players.Add(player);
-            _Turn = id;
+            //_Turn = id;
         }
 
         public static List<Player> GetPlayersList()
@@ -112,23 +113,23 @@ namespace TriviadorServerApi.Entities
         {
             if (GetReadyStatus())
             {
-                LinkedList<int> linkedListNames = new(from player in _Map.Players
-                                                    select player.Id);
+                //LinkedList<int> linkedListNames = new(from player in _Map.Players
+                //                                    select player.Id);
 
-                var name = linkedListNames.First;
-                while (name != null)
-                {
-                    if (name.Value == _Turn)
-                    {
-                        _Turn = (name.Next ?? linkedListNames.First).Value;
-                        break;
-                    }
-                    else
-                    {
-                        name = name.Next;
-                    }
-                }
-
+                //var name = linkedListNames.First;
+                //while (name != null)
+                //{
+                //    if (name.Value == _Turn)
+                //    {
+                //        _Turn = (name.Next ?? linkedListNames.First).Value;
+                //        break;
+                //    }
+                //    else
+                //    {
+                //        name = name.Next;
+                //    }
+                //}
+                _Turn = _Turn == 0 ? 1 : 0;
                 return _Turn;
             }
             else

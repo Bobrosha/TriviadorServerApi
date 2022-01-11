@@ -17,7 +17,11 @@ namespace TriviadorServerApi.Entities
             public List<int> NearestCells { get; set; }
             public Castle Castle { get; set; }
 
-            [JsonConstructor]
+            public Cell()
+            {
+
+            }
+
             public Cell(int id, int value, int ownerId, int lvl, List<int> nearestCells, Castle castle)
             {
                 Id = id;
@@ -118,13 +122,18 @@ namespace TriviadorServerApi.Entities
             CreateCellAndAddInList(list, 14, new int[] { 11, 13, 15 });
             CreateCellAndAddInList(list, 15, new int[] { 12, 14 });
 
-            list[2].OwnerId = 0;
-
-            list[1].OwnerId = 0;
-
-            list[12].OwnerId = 1;
+            InitializePlayerMap(list);
 
             return list;
+        }
+
+        public static void InitializePlayerMap(List<Cell> list)
+        {
+            list[2].OwnerId = 0;
+            list[2].Value = 1000;
+
+            list[12].OwnerId = 1;
+            list[12].Value = 1000;
         }
 
         public static void CreateCellAndAddInList(List<Cell> list, int id, int[] arr, int score = 200)

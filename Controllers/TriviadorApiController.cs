@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using TriviadorServerApi.Entities;
+using static TriviadorServerApi.Entities.TriviadorMap;
 
 namespace TriviadorServerApi.Controllers
 {
@@ -56,7 +58,15 @@ namespace TriviadorServerApi.Controllers
         [HttpPost("checkQuestion")]
         public bool CheckQuestion([FromBody] object answer)
         {
-            return GameSession.CheckQuestion(answer.ToString());
+            try
+            {
+                return GameSession.CheckQuestion(answer.ToString());
+            }
+            catch (Exception e)
+            {
+                _logger.LogWarning("Exception while CheckQuestion: " + e.Message);
+                return false;
+            }
         }
 
         [HttpPost("setMap")]
@@ -90,10 +100,11 @@ namespace TriviadorServerApi.Controllers
         }
 
         [HttpPut("updateCell")]
-        public StatusCodeResult UpdateCell([FromBody] TriviadorMap.Cell cell)
+        public StatusCodeResult UpdateCell([FromBody] object cellString)
         {
             try
             {
+                Cell cell = JsonConvert.DeserializeObject<Cell>(cellString.ToString());
                 _logger.LogDebug($"Updating cell with id = {cell.Id}");
                 GameSession.ChangeCellInMap(cell);
                 _logger.LogDebug($"Updating completed successfull");

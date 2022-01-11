@@ -3,6 +3,8 @@ using System.Text.Json;
 using System.Linq;
 using System;
 using System.Drawing;
+using static TriviadorServerApi.Entities.TriviadorMap;
+using System.IO;
 
 namespace TriviadorServerApi.Entities
 {
@@ -26,8 +28,10 @@ namespace TriviadorServerApi.Entities
 
         private static void InitQuestions()
         {
-            string[] input = { "988", "1011", "983", "995" };
-            _Questions.Add(new Question("В каком году было крещение Руси?", new List<string>(input)));
+            StreamReader sr = new StreamReader("./FileQuestions");
+            string inputJson = sr.ReadToEnd();
+
+            _Questions = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Question>>(inputJson);
         }
 
         public static Question GetQuestion()
@@ -54,13 +58,19 @@ namespace TriviadorServerApi.Entities
 
         public static bool CheckQuestion(string answer)
         {
+            //if (_CurrentQuestion == null)
+            //{
+            //    GetQuestion();
+            //}
+
             bool flag = _CurrentQuestion.ListAnswers[0].Equals(answer);
-            _TurnQuestion++;
-            if (_TurnQuestion >= _Map.Players.Count)
-            {
-                _TurnQuestion = 0;
-                _CurrentQuestion = null;
-            }
+            //_TurnQuestion++;
+            //if (_TurnQuestion >= 2) // более количества пользователей
+            //{
+            //_TurnQuestion = 0;
+            //_CurrentQuestion = null;
+            //}
+            
             return flag;
         }
 
@@ -80,9 +90,19 @@ namespace TriviadorServerApi.Entities
             return _Map;
         }
 
-        public static void ChangeCellInMap(TriviadorMap.Cell cell)
+        public static void ChangeCellInMap(Cell newCell)
         {
-            _Map.Cells[cell.Id - 1] = cell;
+            Cell oldCell = _Map.Cells[newCell.Id - 1];
+
+            _Map.Players[_Turn].Score += newCell.Value;
+
+            if (oldCell.OwnerId != null)
+            {
+                _Map.Players[_Turn == 0 ? 1 : 0].Score -= newCell.Value;
+            }
+
+            _Map.Cells[newCell.Id - 1] = newCell;
+
         }
 
         public static void AddPlayer(Player player)
@@ -90,6 +110,7 @@ namespace TriviadorServerApi.Entities
             var id = _Map.Players.Count;
             player.Id = id;
             player.ColorName = Enum.GetValues(typeof(KnownColor)).GetValue(id).ToString();
+            player.Score = 1000;
             _Map.Players.Add(player);
             //_Turn = id;
         }
@@ -130,6 +151,7 @@ namespace TriviadorServerApi.Entities
                 //    }
                 //}
                 _Turn = _Turn == 0 ? 1 : 0;
+                _CurrentQuestion = null;
                 return _Turn;
             }
             else
